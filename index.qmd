@@ -1,0 +1,12 @@
+---
+title: "LangChain + LangGraph 🦾"
+subtitle: "Språkmodeller satt i system"
+format:
+  revealjs:
+    highlight-style: pygments
+    preview-links: auto
+    logo: assets/nav-logo-red.svg
+    theme: [default, assets/nav.scss]
+    slide-number: true
+language: assets/_quarto_language.yml
+---
