@@ -50,6 +50,11 @@ div.sidebar-item-container .active, div.sidebar-item-container .show > .nav-link
     color: #262626;
 }
 
+.reveal .slide blockquote {
+    color: #262626;
+    font-style: italic;
+}
+
 @media (min-width: 992px) {
     .sidebar-navigation .sidebar-item {
         font-size: unset;
