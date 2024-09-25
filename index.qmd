@@ -1,5 +1,146 @@
-# LangChain
+# LangChain 🦜🔗
+
+::: footer
+[LangChain dokumentasjon](https://python.langchain.com/docs/introduction/)
+:::
 
 ## Hva er det?
 
-# LangGraph
+> LangChain is a framework for developing applications powered by large language
+> models.
+
+. . .
+
+- Integrasjon mellom tilbydere av språkmodeller
+- Gjør ikke noe beregning selv
+	- Alt gjøres av eksterne tjenester
+
+## Hvorfor
+
+- "Språk" for å kjedesammen elementer til språkmodellene
+- Abstraksjon av hendige funksjoner
+
+---
+
+### Bygge ledetekst
+
+```{python}
+from langchain_core.prompts import ChatPromptTemplate
+
+template = "Translate the following into {language}:"
+prompt = ChatPromptTemplate.from_messages(
+	[("system", template), ("user", "{text}")]
+)
+```
+
+---
+
+### Bruke ledetekst
+
+```{python}
+specified = prompt.invoke({"language": "Swedish", "text": "Hi everybody!"})
+specified.to_messages()
+```
+
+---
+
+### Opprette språkmodell
+
+::: {.panel-tabset}
+#### Vertex AI
+
+```{python}
+from langchain_google_vertexai import ChatVertexAI
+
+llm = ChatVertexAI(model_name="gemini-1.5-flash-002")
+```
+
+#### OpenAI
+
+```{.python}
+import os
+
+from langchain_openai import AzureChatOpenAI
+
+llm = AzureChatOpenAI(
+    azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
+    azure_deployment=os.environ["AZURE_OPENAI_DEPLOYMENT_NAME"],
+    openai_api_version=os.environ["AZURE_OPENAI_API_VERSION"],
+)
+```
+:::
+
+::: footer
+- [Referanse til `Gemini 1.5 Flash` på GCP](https://console.cloud.google.com/vertex-ai/publishers/google/model-garden/gemini-1.5-flash-002)
+- [Referanse til `ChatVertexAI` hos LangChain](https://python.langchain.com/docs/integrations/chat/google_vertex_ai_palm/)
+- [Referanse til `AzureChatOpenAI` hos LangChain](https://python.langchain.com/docs/integrations/chat/azure_chat_openai/)
+:::
+
+---
+
+### Bruke språkmodellen
+
+```{python}
+llm.invoke(specified.to_messages())
+```
+
+---
+
+### Kjedesammen elementer
+
+```{python}
+from langchain_core.output_parsers import StrOutputParser
+
+# Opprette en kjede som forenkler å sette sammen ledetekst, språkmodell og tolkning av svaret
+chain = prompt | llm | StrOutputParser()
+# All bruk av LangChain fungerer på samme måte:
+chain.invoke(
+	{"language": "Icelandic", "text": "Hi to every Data Scientist!"}
+)
+```
+
+---
+
+### Abstraksjon
+
+```{.python}
+# Kall på kjeden og produser output
+chain.invoke({...})
+# Strøm svaret mens det blir produsert
+chain.stream({...})
+# Hent flere svar samtidig for raskere prosessering
+chain.batch([{...}, {...}])
+# Finnes også som asynkrone metoder hvis det trengs
+chain.ainvoke({...})
+```
+
+---
+
+### Bakdelen
+
+- Fint når oppsettet er `ledetekst -> språkmodell -> output`
+- Ved mer kompliserte kjeder så blir det vanskelig
+	- Må bruke mange spesialiserte `Runnable`-er
+	- Skriver ikke vanlig Python
+
+# LangGraph 🦜🕸️
+
+::: footer
+[LangGraph dokumentasjon](https://langchain-ai.github.io/langgraph/)
+:::
+
+## Hva er det?
+ 
+ > Build robust and stateful multi-actor applications with LLMs by modeling
+ > steps as edges and nodes in a graph.
+
+ . . .
+
+ - Ikke egentlig noe ny funksjonalitet over LangChain
+ - MEN, enklere å koble sammen ulike kjeder
+	- Bruker vanlige Python metoder!
+
+. . .
+
+- Må ikke være `multi-actor` 😅
+
