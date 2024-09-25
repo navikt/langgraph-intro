@@ -20,8 +20,6 @@
 - "Språk" for å kjedesammen elementer til språkmodellene
 - Abstraksjon av hendige funksjoner
 
----
-
 ### Bygge ledetekst
 
 ```{python}
@@ -33,16 +31,12 @@ prompt = ChatPromptTemplate.from_messages(
 )
 ```
 
----
-
 ### Bruke ledetekst
 
 ```{python}
 specified = prompt.invoke({"language": "Swedish", "text": "Hi everybody!"})
 specified.to_messages()
 ```
-
----
 
 ### Opprette språkmodell
 
@@ -76,15 +70,11 @@ llm = AzureChatOpenAI(
 - [Referanse til `AzureChatOpenAI` hos LangChain](https://python.langchain.com/docs/integrations/chat/azure_chat_openai/)
 :::
 
----
-
 ### Bruke språkmodellen
 
 ```{python}
 llm.invoke(specified.to_messages())
 ```
-
----
 
 ### Kjedesammen elementer
 
@@ -99,8 +89,6 @@ chain.invoke(
 )
 ```
 
----
-
 ### Abstraksjon
 
 ```{.python}
@@ -113,8 +101,6 @@ chain.batch([{...}, {...}])
 # Finnes også som asynkrone metoder hvis det trengs
 chain.ainvoke({...})
 ```
-
----
 
 ### Bakdelen
 
@@ -136,11 +122,12 @@ chain.ainvoke({...})
 
  . . .
 
- - Ikke egentlig noe ny funksjonalitet over LangChain
- - MEN, enklere å koble sammen ulike kjeder
+- Enklere å koble sammen ulike kjeder
 	- Bruker vanlige Python metoder!
+- Kan ha sykluser
 
 . . .
 
 - Må ikke være `multi-actor` 😅
 
+# Spørsmål? 
