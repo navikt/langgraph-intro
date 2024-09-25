@@ -130,4 +130,208 @@ chain.ainvoke({...})
 
 - Må ikke være `multi-actor` 😅
 
+## Motiverende eksempel
+
+- Vi ønsker å hente dokumenter fra en database
+- Når vi får en chat historikk trenger vi kontekst
+	- `Hva er dagpenger?`
+	- _Svar fra språkmodell_
+	- `Kan det samordnes med sykepenger?`
+
+. . .
+
+- Be språkmodellen skrive om spørsmålet slik at vi ikke trenger hele chat historikken!
+	- `Kan dagpenger samordnes med sykepenger?`
+
+### LangChain implementasjon
+
+```{python}
+from langchain_core.prompts import MessagesPlaceholder
+
+contextualize_q_system_prompt = (
+    "Given a chat history and the latest user question "
+    "which might reference context in the chat history, "
+    "formulate a standalone question which can be understood "
+    "without the chat history. Do NOT answer the question, "
+    "just reformulate it if needed and otherwise return it as is."
+)
+
+contextualize_q_prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", contextualize_q_system_prompt),
+        MessagesPlaceholder("chat_history"),
+        ("human", "{input}"),
+    ]
+)
+```
+
+### LangChain implementasjon
+
+```{.python}
+from langchain.chains import create_history_aware_retriever
+
+history_aware_retriever = create_history_aware_retriever(
+	llm, retriever, contextualize_q_prompt
+)
+```
+
+### LangChain implementasjon
+
+```{python}
+from langchain.chains.combine_documents import create_stuff_documents_chain
+
+system_prompt = (
+    "You are an assistant for question-answering tasks. "
+    "Use the following pieces of retrieved context to answer "
+    "the question. If you don't know the answer, say that you "
+    "don't know. Use three sentences maximum and keep the "
+    "answer concise."
+    "\n\n"
+    "{context}"
+)
+qa_prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", system_prompt),
+        MessagesPlaceholder("chat_history"),
+        ("human", "{input}"),
+    ]
+)
+question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
+```
+
+### LangChain implementasjon
+
+```{.python}
+from langchain.chains import create_retrieval_chain
+
+rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
+```
+
+### LangChain implementasjon
+
+```{.python}
+rag_chain.invoke(
+	{
+		"chat_history": [...],
+		"input": "Kan det samordnes med sykepenger?",
+	}
+)
+```
+
+### Utfordringen med LangChain
+
+- Vanskelig å gjøre endringer i `Runnable`-ene
+- `Runnable` er fint som et brukergrensesnitt til `invoke`, `batch`, mf.
+	- Tungvindt å lage `Runnable` som f.eks. ikke skriver om hvis `chat_history` er tom
+
+### LangGraph implementasjon
+
+```{python}
+context_chain = contextualize_q_prompt | llm | StrOutputParser()
+
+def context(state):
+	rewritten = context_chain.invoke({"chat_history": state["chat_history"], "input": state["question"]})
+	state["rewritten_question"] = rewritten
+	return state
+```
+
+### LangGraph implementasjon
+
+```{python}
+retriever = lambda q: ["Vet ikke...", "Aner ikke!", "Hvorfor spør du meg?!"]
+
+def retrieve(state):
+	docs = retriever(state["rewritten_question"])
+	state["context"] = docs
+	return state
+```
+
+### LangGraph implementasjon
+
+```{python}
+generator = qa_prompt | llm | StrOutputParser()
+
+
+def generate(state):
+    answer = generator.invoke({"chat_history": state["chat_history"], "input": state["question"], "context": state["context"]})
+    state["answer"] = answer
+    return state
+```
+
+### LangGraph implementasjon
+
+```{python}
+from typing import TypedDict
+
+class GraphState(TypedDict):
+    question: str
+    chat_history: list[str]
+    rewritten_question: str
+    context: list[str]
+    answer: str
+```
+
+### LangGraph implementasjon
+
+```{python}
+from langgraph.graph import END, START, StateGraph
+
+workflow = StateGraph(GraphState)
+
+workflow.add_node("contextualize", context)
+workflow.add_node("retrieve", retrieve)
+workflow.add_node("generate", generate)
+
+workflow.add_edge(START, "contextualize")
+workflow.add_edge("contextualize", "retrieve")
+workflow.add_edge("retrieve", "generate")
+workflow.add_edge("generate", END)
+
+graph = workflow.compile()
+```
+
+### LangGraph implementasjon
+
+```{mermaid}
+%%| echo: false
+%%{init: {'flowchart': {'curve': 'linear'}}}%%
+graph TD;
+    __start__([<p>__start__</p>]):::first
+    contextualize(contextualize)
+    retrieve(retrieve)
+    generate(generate)
+    __end__([<p>__end__</p>]):::last
+    __start__ --> contextualize;
+    contextualize --> retrieve;
+    generate --> __end__;
+    retrieve --> generate;
+    classDef default fill:#f2f0ff,line-height:1.2
+    classDef first fill-opacity:0
+    classDef last fill:#bfb6fc
+```
+
+### Endre LangGraph
+
+Hva hvis vi ønsker å _ikke_ omskrive spørsmål hvis det ikke er noe historikk?
+
+. . .
+
+```{.python}
+def context(state):
+	if len(state["chat_history"]) > 0:
+		rewritten = context_chain.invoke({"chat_history": state["chat_history"], "input": state["question"]})
+	else:
+		rewritten = state["question"]
+	state["rewritten_question"] = rewritten
+	return state
+```
+
+## Hva er mulig med LangGraph?
+
+![](./images/self-rag.png)
+
+::: footer
+[Eksempel hentet fra LangGraph](https://langchain-ai.github.io/langgraph/tutorials/rag/langgraph_self_rag/)
+:::
+
 # Spørsmål? 
