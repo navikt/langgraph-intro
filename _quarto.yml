@@ -5,6 +5,8 @@ title: "LangChain + LangGraph 🦾"
 subtitle: "Språkmodeller satt i system"
 
 toc: true
+toc-title: "Innhold"
+toc-depth: 2
 language: assets/_quarto_language.yml
 
 format:
