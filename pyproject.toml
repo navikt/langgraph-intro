@@ -1,0 +1,12 @@
+[project]
+name = "langgraph-intro"
+version = "0.1.0"
+description = "Presentasjon av LangChain og LangGraph"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "jupyter>=1.1.1",
+    "langchain-google-vertexai>=2.0.1",
+    "langchain>=0.3.0",
+    "quarto>=0.1.0",
+]
