@@ -8,6 +8,7 @@ toc: true
 toc-title: "Innhold"
 toc-depth: 2
 language: assets/_quarto_language.yml
+mainfont: "Arial"
 
 format:
   revealjs:
