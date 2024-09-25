@@ -4,6 +4,8 @@ project:
 title: "LangChain + LangGraph 🦾"
 subtitle: "Språkmodeller satt i system"
 
+repo-url: https://github.com/navikt/langgraph-intro
+
 toc: true
 toc-title: "Innhold"
 toc-depth: 2
