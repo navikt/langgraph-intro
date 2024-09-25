@@ -10,6 +10,10 @@ toc-depth: 2
 language: assets/_quarto_language.yml
 mainfont: "Arial"
 
+execute: 
+  echo: true
+  eval: false
+
 format:
   revealjs:
     highlight-style: pygments
