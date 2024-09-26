@@ -123,11 +123,11 @@ class Joke(BaseModel):
 
 structured_llm = llm.with_structured_output(Joke)
 joke_prompt = ChatPromptTemplate.from_messages(
-	[("system", "You are a champion level dad-joke teller!"),
+	[("system", "You are a expert level dad-joke teller!"),
 	 ("human", "Tell a joke about {subject}")]
 )
 joke_chain = joke_prompt | structured_llm
-print(joke_chain.invoke({"subject": "data scientists"}))
+print(joke_chain.invoke({"subject": "computers"}))
 ```
 
 ### Bakdelen
