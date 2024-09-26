@@ -37,12 +37,22 @@ prompt = ChatPromptTemplate.from_messages(
 )
 ```
 
+. . .
+
+```{python}
+#| echo: false
+print(prompt.pretty_repr())
+```
+
 ### Bruke ledetekst
 
 ```{python}
 specified = prompt.invoke({"language": "Swedish", "text": "Hi everybody!"})
-print(specified.to_messages())
 ```
+```{python}
+#| echo: false
+print(specified) 
+``` 
 
 ### Opprette språkmodell
 
@@ -80,7 +90,11 @@ llm = AzureChatOpenAI(
 
 ```{python}
 answer = llm.invoke(specified.to_messages())
-print(answer)
+```
+
+```{python}
+#| echo: false
+print(answer) 
 ```
 
 ### Kjedesammen elementer
@@ -127,6 +141,10 @@ joke_prompt = ChatPromptTemplate.from_messages(
 	 ("human", "Tell a joke about {subject}")]
 )
 joke_chain = joke_prompt | structured_llm
+```
+
+```{python}
+#| echo: false
 print(joke_chain.invoke({"subject": "computers"}))
 ```
 
