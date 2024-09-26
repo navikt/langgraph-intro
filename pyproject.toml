@@ -9,5 +9,10 @@ dependencies = [
     "langchain-google-vertexai>=2.0.1",
     "langchain>=0.3.0",
     "langgraph>=0.2.27",
+    "pydantic>=2.9.2",
     "quarto>=0.1.0",
+    "rich>=13.8.1",
 ]
+
+[tool.setuptools]
+py-modules = []
