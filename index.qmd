@@ -150,10 +150,10 @@ print(joke_chain.invoke({"subject": "computers"}))
 
 ### Bakdelen
 
-- Fint når oppsettet er `ledetekst -> språkmodell -> output`
+- Fint når oppsettet er <br/> `ledetekst -> språkmodell -> output`
 - Ved mer kompliserte kjeder så blir det vanskelig
 	- Må bruke mange spesialiserte `Runnable`-er
-	- Skriver ikke vanlig Python
+	- Ikke rett frem Python
 
 # LangGraph 🦜🕸️
 
