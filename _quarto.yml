@@ -14,7 +14,6 @@ mainfont: "Arial"
 
 execute: 
   echo: true
-  eval: false
 
 format:
   revealjs:
