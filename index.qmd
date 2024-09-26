@@ -288,7 +288,9 @@ retriever = lambda q: ["Vet ikke...", "Aner ikke!", "Hvorfor spør du meg?!"]
 
 def retrieve(state):
 	docs = retriever(state["rewritten_question"])
-	state["context"] = docs
+	state["context"] = "\n\n".join(
+		[f"Document {i}:\n{doc}" for i, doc in enumerate(docs)]
+	)
 	return state
 ```
 
