@@ -1,5 +1,10 @@
 # LangChain 🦜🔗
 
+```{python}
+#| echo: false
+from rich import print
+``` 
+
 ::: footer
 [LangChain dokumentasjon](https://python.langchain.com/docs/introduction/)
 :::
@@ -17,6 +22,7 @@
 
 ## Hvorfor
 
+- _Mange_ tilbydere
 - "Språk" for å kjedesammen elementer til språkmodellene
 - Abstraksjon av hendige funksjoner
 
@@ -35,7 +41,7 @@ prompt = ChatPromptTemplate.from_messages(
 
 ```{python}
 specified = prompt.invoke({"language": "Swedish", "text": "Hi everybody!"})
-specified.to_messages()
+print(specified.to_messages())
 ```
 
 ### Opprette språkmodell
@@ -73,7 +79,8 @@ llm = AzureChatOpenAI(
 ### Bruke språkmodellen
 
 ```{python}
-llm.invoke(specified.to_messages())
+answer = llm.invoke(specified.to_messages())
+print(answer)
 ```
 
 ### Kjedesammen elementer
@@ -100,6 +107,27 @@ chain.stream({...})
 chain.batch([{...}, {...}])
 # Finnes også som asynkrone metoder hvis det trengs
 chain.ainvoke({...})
+```
+
+### Strukturerte svar
+
+```{python}
+from typing import Literal
+from pydantic import BaseModel, Field
+
+class Joke(BaseModel):
+	"""Setup and punchline of a joke"""
+	setup: str = Field(description="The setup of the joke")
+	punchline: str = Field(description="The punchline of the joke")
+	rating: int = Field(description="A rating of 1-10 of the dad-joke level")
+
+structured_llm = llm.with_structured_output(Joke)
+joke_prompt = ChatPromptTemplate.from_messages(
+	[("system", "You are a champion level dad-joke teller!"),
+	 ("human", "Tell a joke about {subject}")]
+)
+joke_chain = joke_prompt | structured_llm
+print(joke_chain.invoke({"subject": "data scientists"}))
 ```
 
 ### Bakdelen
