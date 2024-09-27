@@ -78,6 +78,17 @@ llm = AzureChatOpenAI(
     openai_api_version=os.environ["AZURE_OPENAI_API_VERSION"],
 )
 ```
+
+#### Ollama
+
+```{.python}
+from langchain_ollama import ChatOllama
+
+llm = ChatOllama(
+    model = "llama3",
+    temperature = 0.8,
+)
+```
 :::
 
 ::: footer
