@@ -288,8 +288,7 @@ context_chain = contextualize_q_prompt | llm | StrOutputParser()
 
 def context(state):
 	rewritten = context_chain.invoke({"chat_history": state["chat_history"], "input": state["question"]})
-	state["rewritten_question"] = rewritten
-	return state
+	return {"rewritten_question": rewritten}
 ```
 
 ### LangGraph implementasjon
@@ -299,10 +298,10 @@ retriever = lambda q: ["Vet ikke...", "Aner ikke!", "Hvorfor spør du meg?!"]
 
 def retrieve(state):
 	docs = retriever(state["rewritten_question"])
-	state["context"] = "\n\n".join(
+	ctx = "\n\n".join(
 		[f"Document {i}:\n{doc}" for i, doc in enumerate(docs)]
 	)
-	return state
+	return {"context": ctx}
 ```
 
 ### LangGraph implementasjon
@@ -310,11 +309,9 @@ def retrieve(state):
 ```{python}
 generator = qa_prompt | llm | StrOutputParser()
 
-
 def generate(state):
     answer = generator.invoke({"chat_history": state["chat_history"], "input": state["question"], "context": state["context"]})
-    state["answer"] = answer
-    return state
+    return {"answer": answer}
 ```
 
 ### LangGraph implementasjon
@@ -338,8 +335,8 @@ from langgraph.graph import END, START, StateGraph
 workflow = StateGraph(GraphState)
 
 workflow.add_node("contextualize", context)
-workflow.add_node("retrieve", retrieve)
-workflow.add_node("generate", generate)
+workflow.add_node(retrieve)
+workflow.add_node(generate)
 
 workflow.add_edge(START, "contextualize")
 workflow.add_edge("contextualize", "retrieve")
@@ -399,8 +396,7 @@ def context(state):
 		rewritten = context_chain.invoke({"chat_history": state["chat_history"], "input": state["question"]})
 	else:
 		rewritten = state["question"]
-	state["rewritten_question"] = rewritten
-	return state
+	return {"rewritten_question": rewritten}
 ```
 
 ## Hva er mulig med LangGraph?
