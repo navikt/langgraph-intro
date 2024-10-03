@@ -154,6 +154,8 @@ joke_prompt = ChatPromptTemplate.from_messages(
 joke_chain = joke_prompt | structured_llm
 ```
 
+. . .
+
 ```{python}
 #| echo: false
 print(joke_chain.invoke({"subject": "computers"}))
@@ -189,7 +191,11 @@ print(joke_chain.invoke({"subject": "computers"}))
 
 ## Motiverende eksempel
 
-- Vi ønsker å hente dokumenter fra en database
+- Vi ønsker å hente dokumenter fra en database og gi disse til språkmodellen for
+å generere et svar
+
+. . .
+
 - Når vi får en chat historikk trenger vi kontekst
 	- `Hva er dagpenger?`
 	- _Svar fra språkmodell_
